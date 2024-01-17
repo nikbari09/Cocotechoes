@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define NUM_STUDENTS 20
+#define NUM_SUBJECTS 5
+
+// Structure to store student information
+struct Student 
+{
+   char name[50];
+   int subject_total_marks[NUM_SUBJECTS];
+   int subject_scored_marks[NUM_SUBJECTS];
+   int total_scored;
+};
+
+// Function to create random student data
+void create_random_data(struct Student students[], int num_students) 
+{
+   srand(time(NULL));  // Seed the random number generator
+
+   for (int i = 0; i < NUM_STUDENTS; i++) 
+   {
+       sprintf(students[i].name, "Student%d", i + 1);
+
+       for (int j = 0; j < NUM_SUBJECTS; j++) 
+	   {
+           students[i].subject_total_marks[j] = rand() % 101 + 50;  // Random total marks between 50 and 150
+           students[i].subject_scored_marks[j] = rand() % students[i].subject_total_marks[j];  // Random scored marks within the total
+           students[i].total_scored += students[i].subject_scored_marks[j];
+       }
+   }
+}
+
+// Function to compare students based on total scored marks
+int compare_students(const void *a, const void *b) 
+{
+   struct Student *student1 = (struct Student *)a;
+   struct Student *student2 = (struct Student *)b;
+
+   return student2->total_scored - student1->total_scored;  // Descending order
+}
+
+int main() 
+{
+   struct Student students[NUM_STUDENTS];
+
+   create_random_data(students, NUM_STUDENTS);
+
+   // Sort the students based on total scored marks
+   qsort(students, NUM_STUDENTS, sizeof(struct Student), compare_students);
+
+   printf("Top 5 Students:\n");
+   for (int i = 0; i < 5; i++) 
+   {
+       printf("%s (", students[i].name);
+       for (int j = 0; j < NUM_SUBJECTS; j++) 
+	   {
+           printf("%s, %d, %d | ", "Subject", students[i].subject_total_marks[j], students[i].subject_scored_marks[j]);
+       }
+       printf("Total Scored: %d)\n", students[i].total_scored);
+   }
+
+   return 0;
+}
